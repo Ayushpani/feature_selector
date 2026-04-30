@@ -1,0 +1,371 @@
+
+        <html>
+        <head>
+            <title>Feature Engine Pro Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                .dropped { color: red; }
+                .kept { color: green; }
+            </style>
+        </head>
+        <body>
+            <h2>Feature Engine Pro - Audit Report</h2>
+            <p><strong>Total Kept:</strong> 23</p>
+            <p><strong>Total Dropped:</strong> 26</p>
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>Status</th>
+                    <th>Step</th>
+                    <th>Reason</th>
+                </tr>
+
+                <tr>
+                    <td>mean radius</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 12.4189 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean texture</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 18.1969 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean perimeter</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 590.4405 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean area</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 123843.5543 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean smoothness</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0002 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean compactness</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0028 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean concavity</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0064 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean concave points</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0015 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean symmetry</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0008 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean fractal dimension</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0000 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>radius error</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0769 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>texture error</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.3043 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>perimeter error</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 4.0879 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>area error</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 2069.4316 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>smoothness error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0000 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>compactness error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0003 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>concavity error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0009 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>concave points error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0000 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>symmetry error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0001 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>fractal dimension error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0000 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst radius</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 23.3602 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst texture</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 37.7765 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst perimeter</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 1129.1308 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst area</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 324167.3851 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst smoothness</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0005 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst compactness</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0248 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst concavity</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0435 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst concave points</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0043 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst symmetry</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0038 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>worst fractal dimension</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0003 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>constant_col</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.0000 is below threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>duplicate_mean_radius</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 12.4214 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>category_col</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>VarianceThreshold</td>
+                    <td>Variance 0.2342 is above threshold 0.01</td>
+                </tr>
+
+                <tr>
+                    <td>mean radius</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 1.00 with mean perimeter. Kept mean perimeter because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>mean area</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.99 with mean perimeter. Kept mean perimeter because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>perimeter error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.97 with radius error. Kept radius error because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>area error</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.95 with radius error. Kept radius error because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>mean perimeter</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.97 with worst radius. Kept worst radius because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>mean texture</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.90 with worst texture. Kept worst texture because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>worst radius</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.99 with worst perimeter. Kept worst perimeter because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>worst area</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.98 with worst perimeter. Kept worst perimeter because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>duplicate_mean_radius</td>
+                    <td class="dropped"><strong>DROPPED</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>Correlated 0.97 with worst perimeter. Kept worst perimeter because it has higher correlation to target.</td>
+                </tr>
+
+                <tr>
+                    <td>radius error</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>No collinearity above 0.9 threshold found</td>
+                </tr>
+
+                <tr>
+                    <td>texture error</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>No collinearity above 0.9 threshold found</td>
+                </tr>
+
+                <tr>
+                    <td>worst texture</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>No collinearity above 0.9 threshold found</td>
+                </tr>
+
+                <tr>
+                    <td>worst perimeter</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>No collinearity above 0.9 threshold found</td>
+                </tr>
+
+                <tr>
+                    <td>worst compactness</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>No collinearity above 0.9 threshold found</td>
+                </tr>
+
+                <tr>
+                    <td>worst concavity</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>No collinearity above 0.9 threshold found</td>
+                </tr>
+
+                <tr>
+                    <td>category_col</td>
+                    <td class="kept"><strong>KEPT</strong></td>
+                    <td>CorrelationSelector</td>
+                    <td>No collinearity above 0.9 threshold found</td>
+                </tr>
+
+            </table>
+        </body>
+        </html>
