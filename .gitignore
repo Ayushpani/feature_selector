@@ -1,1 +1,4 @@
 .venv
+test_report.html
+__pycache__/
+*.pyc
