@@ -1,65 +1,42 @@
-# Feature Engine Pro v2.0
+# Feature Engine Pro
 
-**Feature Engine Pro** is an industry-grade, deterministically-driven Python library designed for automated feature engineering, mathematically rigorous feature selection, and transparent audit reporting.
+Feature Engine Pro is an advanced, deterministically-driven Python library designed for automated feature engineering and mathematically rigorous feature selection.
 
-In real-world machine learning environments, datasets frequently contain hundreds or thousands of columns with missing data, extreme outliers, high cardinality, and extreme collinearity. Navigating this high dimensionality manually is prone to error, bias, and data leakage. Feature Engine Pro solves this by providing a robust, 13-stage Scikit-Learn compatible mathematical funnel that autonomously engineers features, handles edge cases, and selects only the signals that positively impact model performance.
+In real-world machine learning environments, datasets frequently contain hundreds or thousands of columns. Navigating this high dimensionality manually is prone to error and bias. Feature Engine Pro solves this by providing a multi-stage, Scikit-Learn compatible mathematical funnel that autonomously selects only the features that positively impact model performance.
 
-Crucially, this library resolves the "black box" problem of automated ML pipelines by generating a highly professional **Interactive HTML and PDF Audit Report**, detailing the exact mathematical reasoning behind every feature kept, modified, or dropped.
+Crucially, this library resolves the "black box" problem of automated data pipelines by generating a comprehensive HTML Audit Report, detailing the exact mathematical reasoning behind every feature kept or dropped.
 
 ## Core Philosophy
 
-1. **Deterministic and Mathematical:** Relies entirely on robust statistical techniques (ANOVA, Variance, Hierarchical Clustering, Information Theory, Recursive Feature Elimination) ensuring highly reproducible results without relying on costly non-deterministic logic.
-2. **Transparent Audit Trail:** The Engine logs every action and compiles a visual report detailing the exact lifecycle of every column.
-3. **Impeccable Safety & Scikit-Learn Native:** Designed to slot perfectly into existing `sklearn.pipeline.Pipeline` architectures. Handles infinite values, entirely-NaN columns, extreme cardinality, and mixed types without crashing. Strictly segregates `fit()` and `transform()` to completely eliminate data leakage.
-4. **Environment-Aware UX:** The logger auto-detects if you are in a Jupyter Notebook, VS Code Terminal, or CI/CD runner, and gracefully adapts its output.
+1. **Deterministic and Mathematical:** Relies entirely on robust statistical techniques (Variance, Pearson/Spearman correlation, Information Theory, Recursive Feature Elimination) rather than non-deterministic or costly LLM-based agent swarms.
+2. **Transparent "Audit Trail":** Never wonder why a feature disappeared. The Engine logs every action and compiles a visual report.
+3. **Scikit-Learn Native:** Designed to slot perfectly into existing `sklearn.pipeline.Pipeline` architectures, complete with `fit()`, `transform()`, and `GridSearchCV` compatibility to prevent data leakage.
+4. **End-to-End Execution:** Automatically handles missing values, encodes complex text/categorical variables, extracts temporal features, and reduces dimensionality in a single execution.
 
-## Benchmark Performance
+## Pipeline Architecture
 
-Feature Engine Pro is designed to drastically reduce dimensionality (and thus computational overhead and overfitting risk) while maintaining or even improving model performance.
-
-| Dataset | Original Features | Features After Selection | Dimensionality Reduction | Baseline Performance | Engineered Performance | Change |
-|---------|------------------|--------------------------|--------------------------|----------------------|------------------------|--------|
-| Breast Cancer (Classification) | 34 | 4 | **-88.2%** | 96.26% Accuracy | 96.26% Accuracy | 0.00% |
-| Wine (Classification) | 16 | 6 | **-62.5%** | 97.22% Accuracy | 97.22% Accuracy | 0.00% |
-| Diabetes (Regression) | 13 | 4 | **-69.2%** | 0.452 R2 Score | 0.457 R2 Score | **+0.005 R2** |
-
-*Note: Models evaluated using 5-fold cross-validation with Random Forest estimators.*
-
-## Pipeline Architecture (13 Stages)
-
-Feature Engine Pro processes high-dimensional data through a sequence of intelligent, modular stages:
+Feature Engine Pro processes high-dimensional data through a sequence of modular stages:
 
 ### Stage 1: Automated Feature Engineering
-* **Datetime Expansion:** Detects temporal columns, extracts granular components, and applies Cyclic Encoding (sin/cos transformations) for periodic features.
-* **Group Aggregation:** Autonomously detects ID-based columns and engineers aggregated statistics (mean, std, min, max).
-* **Polynomial Feature Generation:** Generates non-linear interaction features utilizing Target-Correlation Pre-Screening to prevent combinatorial explosion.
+* **Datetime Expansion:** Detects temporal columns and extracts granular numerical representations (year, month, day, day-of-week, weekend flags).
+* **Group Aggregation:** Autonomously detects ID-based columns and engineers aggregated statistics (mean, sum) to capture group-level behavior.
 
 ### Stage 2: Data Pre-Processing & Encoding
-* **Robust Data Cleaning:** Handles infinity, drops duplicate columns, and eliminates 100% NaN columns automatically.
-* **Outlier Handling:** Employs IQR, Z-Score, or MAD algorithms to gracefully clip or nullify extreme outliers without dropping rows.
-* **Skewness Correction:** Auto-detects highly skewed numerical distributions and applies logarithmic or Box-Cox transformations.
-* **Auto-Categorical Encoding:** Leverages Smoothed Bayesian Target Encoding to safely convert high-cardinality strings to numerical data, preventing leakage.
+* **Secure Imputation:** Learns missing value distributions (mean, median) during `.fit()` and safely applies them during `.transform()`.
+* **Target Encoding:** Converts high-cardinality categorical string columns into continuous numerical data by mapping them against the target variable.
 
 ### Stage 3: The Mathematical Selection Funnel
-* **Variance Filter:** Eliminates zero-variance constants and quasi-constant features.
-* **Hierarchical Collinearity Filter:** Identifies heavily correlated pairs via Hierarchical Clustering, intelligently keeping the feature with the highest independent predictive power against the target.
-* **Mutual Information:** Applies stable Information Theory to identify complex, non-linear dependencies.
-* **Statistical Testing:** Applies robust ANOVA / Chi2 testing with Bonferroni correction to ensure only statistically significant features survive.
-* **Recursive Feature Elimination (RFE):** Uses cross-validated tree-based estimators to iteratively prune the weakest remaining columns and find the absolute optimal feature count.
-
----
+* **Variance Filter:** Eliminates zero-variance constants and low-variance features that carry no signal.
+* **Collinearity Filter:** Identifies heavily correlated feature pairs. It evaluates both features against the target variable and intelligently drops the redundant feature providing the least predictive power.
+* **Mutual Information:** Applies Information Theory to identify and preserve features with complex, non-linear dependencies on the target.
+* **Recursive Feature Elimination (RFE):** Uses tree-based ensemble estimators (Random Forest) and feature importance ranking to iteratively prune the weakest remaining columns.
 
 ## Installation
 
-```bash
-pip install -e .
-```
-*(Dependencies: pandas, numpy, scikit-learn, plotly, scipy)*
+*(Note: Package is currently in pre-release development phase)*
 
-**For automated high-quality PDF generation**, Playwright is required:
 ```bash
-pip install playwright
-python -m playwright install chromium
+pip install feature-engine-pro
 ```
 
 ## Quick Start Guide
@@ -79,13 +56,14 @@ y = df["target"]
 # 2. Split Data (Crucial for preventing data leakage)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# 3. Initialize Feature Engine (Try mode='fast', 'balanced', or 'thorough')
+# 3. Initialize Feature Engine
 engine = FeatureEngine(
     target_column="target",
     problem_type="classification",
-    mode="balanced",  # Balances deep feature engineering with execution speed
-    enable_evaluation=True, # Validates model impact (Before vs After)
-    verbosity=1
+    variance_threshold=0.01,
+    correlation_threshold=0.85,
+    mi_threshold=0.01,
+    rfe_n_features=25
 )
 
 # 4. Fit the pipeline to training data
@@ -95,27 +73,42 @@ engine.fit(X_train, y_train)
 X_train_clean = engine.transform(X_train)
 X_test_clean = engine.transform(X_test)
 
-# 6. Generate the HTML and PDF Audit Reports
-engine.reporter_.generate_pdf_report(
-    html_filepath="audit_report.html",
-    pdf_filepath="audit_report.pdf"
-)
-
-# 7. Print Console Summary
-engine.print_summary()
+# 6. Generate the Audit Report
+engine.generate_report(filepath="feature_audit_report.html")
 ```
 
-## The Corporate Audit Report
+## Advanced Usage: GridSearchCV
 
-Calling `.generate_pdf_report()` produces a stunning, standalone HTML document and a high-fidelity PDF featuring:
+Because `FeatureEngine` inherits from `BaseEstimator` and `TransformerMixin`, it natively supports hyperparameter tuning to find the optimal mathematical thresholds for your specific dataset.
 
-![Report Summary Header](file:///C:/Users/Ayush/.gemini/antigravity/brain/b423a9f2-a7c9-44fd-8b2f-6db97e9c3430/report_summary_header_1777625663948.png)
+```python
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import GradientBoostingClassifier
 
-* **The Attrition Funnel:** A chart illustrating the reduction of features at each stage.
-![Attrition Funnel](file:///C:/Users/Ayush/.gemini/antigravity/brain/b423a9f2-a7c9-44fd-8b2f-6db97e9c3430/report_funnel_correlation_1777625688202.png)
+pipeline = Pipeline([
+    ('feature_engine', FeatureEngine(problem_type='classification')),
+    ('classifier', GradientBoostingClassifier())
+])
 
-* **Performance Impact:** An automated validation comparing model performance on the original vs. engineered dataset.
-![Performance Impact](file:///C:/Users/Ayush/.gemini/antigravity/brain/b423a9f2-a7c9-44fd-8b2f-6db97e9c3430/report_performance_impact_1777625700404.png)
+param_grid = {
+    'feature_engine__correlation_threshold': [0.75, 0.85, 0.95],
+    'feature_engine__mi_threshold': [0.01, 0.05],
+    'classifier__learning_rate': [0.01, 0.1]
+}
 
-* **The Audit Trail:** A comprehensive search-enabled table detailing the exact mathematical reason a specific column was eliminated or engineered.
-![Audit Trail](file:///C:/Users/Ayush/.gemini/antigravity/brain/b423a9f2-a7c9-44fd-8b2f-6db97e9c3430/report_audit_trail_1777625712921.png)
+grid_search = GridSearchCV(pipeline, param_grid, cv=5)
+grid_search.fit(X_train, y_train)
+```
+
+## The Audit Report
+
+Calling `.generate_report("report.html")` produces a standalone HTML document containing:
+* A summary count of features kept vs. dropped.
+* A visual Bar Chart Funnel illustrating the reduction at each pipeline stage.
+* A pre-filtering Correlation Heatmap to visualize dataset collinearity.
+* A comprehensive Tabular Audit Trail detailing the exact mathematical reason a specific column was eliminated (e.g., *"[CorrelationSelector] Dropped: Correlated 0.92 with feature_X. Kept feature_X because it has higher correlation to target."*).
+
+## Contributing
+
+Contributions to mathematical optimization, expanding the suite of transformers, or improving computational efficiency for massive datasets are welcome. Please ensure all pull requests maintain Scikit-Learn compatibility and do not introduce data leakage.

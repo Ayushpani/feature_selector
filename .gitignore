@@ -1,16 +1,8 @@
 .venv
+test_report.html
+<<<<<<< Updated upstream
+=======
+test_report_v2.html
+>>>>>>> Stashed changes
 __pycache__/
 *.pyc
-*.pyo
-*.egg-info/
-dist/
-build/
-.pytest_cache/
-htmlcov/
-.coverage
-test_report*.html
-*.html
-!feature_engine_pro/**/*.html
-*.pdf
-*.joblib
-scratch/
