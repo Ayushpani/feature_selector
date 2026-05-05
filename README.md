@@ -6,6 +6,21 @@ In real-world machine learning environments, datasets frequently contain hundred
 
 Crucially, this library resolves the "black box" problem of automated data pipelines by generating a comprehensive HTML Audit Report, detailing the exact mathematical reasoning behind every feature kept or dropped.
 
+## Installation
+
+You can install Feature Engine Pro directly from source:
+
+```bash
+pip install .
+```
+
+For PDF report generation support, install with the `pdf` extra:
+
+```bash
+pip install ".[pdf]"
+playwright install chromium
+```
+
 ## Core Philosophy
 
 1. **Deterministic and Mathematical:** Relies entirely on robust statistical techniques (Variance, Pearson/Spearman correlation, Information Theory, Recursive Feature Elimination) rather than non-deterministic or costly LLM-based agent swarms.
