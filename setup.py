@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="feature-engine-pro",
-    version="0.1.0",
+    version="0.1.1",
     packages=find_packages(),
     install_requires=[
         "pandas>=1.0.0",
@@ -13,6 +13,7 @@ setup(
         "matplotlib>=3.3.0",
         "seaborn>=0.11.0",
         "playwright>=1.15.0",
+        "nest-asyncio>=1.5.0",
     ],
     extras_require={},
     author="Feature Engine Pro Team",

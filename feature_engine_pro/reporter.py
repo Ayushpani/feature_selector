@@ -78,6 +78,13 @@ class Reporter:
             self._logger.error("[Reporter] Playwright is not installed. This should not happen if the package was installed correctly.")
             return
 
+        # Fix for Colab/Jupyter: Playwright Sync API doesn't work if an asyncio loop is already running.
+        try:
+            import nest_asyncio
+            nest_asyncio.apply()
+        except ImportError:
+            pass
+
         self.generate_html_report(html_filepath)
         abs_path = os.path.abspath(html_filepath)
         file_url = f"file:///{abs_path.replace('\\', '/')}"
