@@ -1,37 +1,24 @@
 Metadata-Version: 2.4
 Name: feature-engine-pro
-Version: 2.0.0
-Summary: Industry-grade automated feature engineering and mathematically rigorous feature selection for Python.
-Author: Ayush Pani
+Version: 0.1.0
+Summary: A professional, enterprise-grade feature selection and engineering pipeline.
+Home-page: https://github.com/Ayushpani/feature_selector
+Author: Feature Engine Pro Team
 License: MIT
-Project-URL: Repository, https://github.com/AyushPani/feature_selector
-Classifier: Development Status :: 4 - Beta
-Classifier: Intended Audience :: Developers
-Classifier: Intended Audience :: Science/Research
-Classifier: License :: OSI Approved :: MIT License
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.9
-Classifier: Programming Language :: Python :: 3.10
-Classifier: Programming Language :: Python :: 3.11
-Classifier: Programming Language :: Python :: 3.12
-Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
-Classifier: Topic :: Software Development :: Libraries :: Python Modules
-Requires-Python: >=3.9
+Requires-Python: >=3.8
 Description-Content-Type: text/markdown
-Requires-Dist: pandas>=1.5.0
-Requires-Dist: numpy>=1.23.0
-Requires-Dist: scikit-learn>=1.2.0
-Requires-Dist: matplotlib>=3.6.0
-Requires-Dist: seaborn>=0.12.0
-Requires-Dist: plotly>=5.15.0
-Requires-Dist: scipy>=1.10.0
-Requires-Dist: joblib>=1.2.0
-Provides-Extra: explain
-Requires-Dist: shap>=0.42.0; extra == "explain"
-Provides-Extra: dev
-Requires-Dist: pytest>=7.0; extra == "dev"
-Requires-Dist: pytest-cov>=4.0; extra == "dev"
-Requires-Dist: shap>=0.42.0; extra == "dev"
+Requires-Dist: pandas>=1.0.0
+Requires-Dist: numpy>=1.18.0
+Requires-Dist: scikit-learn>=0.24.0
+Requires-Dist: joblib>=1.0.0
+Requires-Dist: plotly>=5.0.0
+Requires-Dist: matplotlib>=3.3.0
+Requires-Dist: seaborn>=0.11.0
+Requires-Dist: playwright>=1.15.0
+Provides-Extra: test
+Requires-Dist: pytest>=6.0.0; extra == "test"
+Dynamic: home-page
+Dynamic: requires-python
 
 # Feature Engine Pro
 
@@ -40,6 +27,16 @@ Feature Engine Pro is an advanced, deterministically-driven Python library desig
 In real-world machine learning environments, datasets frequently contain hundreds or thousands of columns. Navigating this high dimensionality manually is prone to error and bias. Feature Engine Pro solves this by providing a multi-stage, Scikit-Learn compatible mathematical funnel that autonomously selects only the features that positively impact model performance.
 
 Crucially, this library resolves the "black box" problem of automated data pipelines by generating a comprehensive HTML Audit Report, detailing the exact mathematical reasoning behind every feature kept or dropped.
+
+## Installation
+
+Simply install the package using pip:
+
+```bash
+pip install .
+```
+
+*Note: The library will automatically handle browser dependencies (Playwright/Chromium) the first time you generate a PDF report.*
 
 ## Core Philosophy
 

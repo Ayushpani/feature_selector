@@ -1,5 +1,6 @@
 README.md
 pyproject.toml
+setup.py
 feature_engine_pro/__init__.py
 feature_engine_pro/data_processor.py
 feature_engine_pro/engine.py
@@ -17,7 +18,6 @@ feature_engine_pro/selectors/correlation.py
 feature_engine_pro/selectors/mutual_information.py
 feature_engine_pro/selectors/rfe.py
 feature_engine_pro/selectors/select_k_best.py
-feature_engine_pro/selectors/shap_selector.py
 feature_engine_pro/selectors/variance_threshold.py
 feature_engine_pro/transformers/__init__.py
 feature_engine_pro/transformers/base_transformer.py
@@ -25,10 +25,8 @@ feature_engine_pro/transformers/categorical_encoder.py
 feature_engine_pro/transformers/datetime_extractor.py
 feature_engine_pro/transformers/group_aggregator.py
 feature_engine_pro/transformers/log_transform.py
-feature_engine_pro/transformers/outlier_handler.py
 feature_engine_pro/transformers/polynomial_features.py
 tests/test_data_processor.py
-tests/test_edge_cases.py
 tests/test_inference.py
 tests/test_selecctors.py
 tests/test_transformers.py
