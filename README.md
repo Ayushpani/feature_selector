@@ -8,18 +8,13 @@ Crucially, this library resolves the "black box" problem of automated data pipel
 
 ## Installation
 
-You can install Feature Engine Pro directly from source:
+Simply install the package using pip:
 
 ```bash
 pip install .
 ```
 
-For PDF report generation support, install with the `pdf` extra:
-
-```bash
-pip install ".[pdf]"
-playwright install chromium
-```
+*Note: The library will automatically handle browser dependencies (Playwright/Chromium) the first time you generate a PDF report.*
 
 ## Core Philosophy
 

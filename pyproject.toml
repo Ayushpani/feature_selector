@@ -20,10 +20,10 @@ dependencies = [
     "plotly>=5.0.0",
     "matplotlib>=3.3.0",
     "seaborn>=0.11.0",
+    "playwright>=1.15.0",
 ]
 
 [project.optional-dependencies]
-pdf = ["playwright>=1.15.0"]
 test = ["pytest>=6.0.0"]
 
 [tool.setuptools]

@@ -12,10 +12,9 @@ setup(
         "plotly>=5.0.0",
         "matplotlib>=3.3.0",
         "seaborn>=0.11.0",
+        "playwright>=1.15.0",
     ],
-    extras_require={
-        "pdf": ["playwright>=1.15.0"],
-    },
+    extras_require={},
     author="Feature Engine Pro Team",
     description="A professional, enterprise-grade feature selection and engineering pipeline.",
     long_description=open("README.md").read(),

@@ -66,23 +66,43 @@ class Reporter:
         return pd.DataFrame(self.logs)
 
     def generate_pdf_report(self, html_filepath="feature_engine_report.html", pdf_filepath="feature_engine_report.pdf"):
-        """Generate a high-quality PDF report using Playwright."""
+        """Generate a high-quality PDF report using Playwright, auto-installing browsers if needed."""
         import os
         import time
+        import subprocess
+        import sys
+        
         try:
             from playwright.sync_api import sync_playwright
         except ImportError:
-            self._logger.error("[Reporter] Playwright is not installed. To generate PDFs, run: pip install playwright && playwright install chromium")
+            self._logger.error("[Reporter] Playwright is not installed. This should not happen if the package was installed correctly.")
             return
 
         self.generate_html_report(html_filepath)
         abs_path = os.path.abspath(html_filepath)
         file_url = f"file:///{abs_path.replace('\\', '/')}"
 
-        self._logger.info(f"[Reporter] Generating PDF (this may take a few seconds)...")
+        self._logger.info(f"[Reporter] Preparing PDF generation...")
+        
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=True)
+            try:
+                browser = p.chromium.launch(headless=True)
+            except Exception as e:
+                if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
+                    self._logger.info("[Reporter] Chromium browser not found. Automatically installing (one-time setup)...")
+                    try:
+                        subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                        browser = p.chromium.launch(headless=True)
+                    except Exception as install_err:
+                        self._logger.error(f"[Reporter] Automatic browser installation failed: {install_err}")
+                        self._logger.error("Please run 'playwright install chromium' manually.")
+                        return
+                else:
+                    self._logger.error(f"[Reporter] Failed to launch browser: {e}")
+                    return
+
             page = browser.new_page()
+            self._logger.info(f"[Reporter] Generating PDF (this may take a few seconds)...")
             # Wait for Plotly to render
             page.goto(file_url, wait_until='networkidle')
             time.sleep(2)  # Give JS an extra moment for rendering
