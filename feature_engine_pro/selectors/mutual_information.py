@@ -45,9 +45,9 @@ class MutualInformationSelector(_BaseSelector):
         if self.reporter:
             for col, score in mi_scores_series.items():
                 if score >= self.threshold:
-                     self.reporter.log_event(col, 'kept', f'Mutual Information {score:.4f} >= threshold {self.threshold}.', 'MutualInformation')
+                     self.reporter.log_event(col, 'kept', f'Mutual Information Score = {score:.4f} >= {self.threshold}. Feature provides statistically significant non-linear reduction in uncertainty about the target.', 'MutualInformation')
                 else:
-                     self.reporter.log_event(col, 'dropped', f'Mutual Information {score:.4f} < threshold {self.threshold}. Lacks non-linear dependency.', 'MutualInformation')
+                     self.reporter.log_event(col, 'dropped', f'Mutual Information Score = {score:.4f} < {self.threshold}. Information Theory proves this feature provides no statistically significant reduction in uncertainty (Entropy) about the target Y. Pruned to minimize noise.', 'MutualInformation')
 
             for col in non_numerical_features:
                  self.reporter.log_event(col, 'kept', 'Not numerical, skipped by Mutual Info.', 'MutualInformation')

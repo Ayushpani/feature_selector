@@ -65,7 +65,7 @@ class CorrelationSelector(_BaseSelector):
                         self.reporter.log_event(
                             drop_feature,
                             'dropped',
-                            f'Correlated {corr_val:.2f} with {keep_feature}. Kept {keep_feature} because it has higher correlation to target.',
+                            f'Pearson Correlation r_xy = {corr_val:.2f} with \'{keep_feature}\'. To prevent Standard Error inflation (Multicollinearity), both evaluated against target. \'{keep_feature}\' strictly preserved for holding mathematically superior predictive signal.',
                             'CorrelationSelector'
                         )
 

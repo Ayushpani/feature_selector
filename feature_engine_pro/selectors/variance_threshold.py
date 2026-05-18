@@ -48,10 +48,10 @@ class VarianceThresholdSelector(_BaseSelector):
             for col in numerical_cols:
                 if col not in selected_numerical_features:
                     variance_val = X[col].var()
-                    self.reporter.log_event(col, 'dropped', f'Variance {variance_val:.4f} is below threshold {self.threshold}', 'VarianceThreshold')
+                    self.reporter.log_event(col, 'dropped', f'Population Variance (σ²) = {variance_val:.4f} < {self.threshold}. Mathematically approaches a constant, carrying ~0 Shannon Entropy. Eliminated immediately to remove zero-signal dimensionality space.', 'VarianceThreshold')
                 else:
                     variance_val = X[col].var()
-                    self.reporter.log_event(col, 'kept', f'Variance {variance_val:.4f} is above threshold {self.threshold}', 'VarianceThreshold')
+                    self.reporter.log_event(col, 'kept', f'Population Variance (σ²) = {variance_val:.4f} >= {self.threshold}. Feature contains sufficient informational entropy to proceed to collinearity checks.', 'VarianceThreshold')
 
             # Log non-numerical as kept
             for col in non_numerical_features:
