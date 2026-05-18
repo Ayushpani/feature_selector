@@ -1,20 +1,20 @@
 """
 Demo Usage - Full Working Example
 
-Demonstrates the complete Feature Engine Pro pipeline on the Breast Cancer dataset.
+Demonstrates the complete PruneX pipeline on the Breast Cancer dataset.
 Generates an interactive HTML Audit Report and a high-fidelity PDF.
 """
 import pandas as pd
 import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
-from feature_engine_pro.engine import FeatureEngine
+from prunex.engine import FeatureEngine
 
 
 def main():
-    """Run a full demonstration of Feature Engine Pro."""
+    """Run a full demonstration of PruneX."""
     print("=" * 60)
-    print("  Feature Engine Pro v2.0 - Demo")
+    print("  PruneX v1.0 - Demo")
     print("=" * 60)
 
     # 1. Load Data

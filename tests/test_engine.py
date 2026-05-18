@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 from sklearn.datasets import load_breast_cancer
-from feature_engine_pro.engine import FeatureEngine
+from prunex.engine import FeatureEngine
 
 def test_engine_end_to_end():
     # Arrange

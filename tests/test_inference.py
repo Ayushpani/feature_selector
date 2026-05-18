@@ -1,5 +1,5 @@
 import pandas as pd
-from feature_engine_pro.engine import FeatureEngine
+from prunex.engine import FeatureEngine
 from sklearn.model_selection import train_test_split
 from sklearn.datasets import load_diabetes
 

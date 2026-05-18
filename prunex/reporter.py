@@ -23,7 +23,7 @@ import time
 import json
 from datetime import datetime
 
-from feature_engine_pro.logger import get_logger
+from prunex.logger import get_logger
 
 
 class Reporter:
@@ -246,7 +246,7 @@ class Reporter:
         """Print summary to console."""
         p = lambda s: print(self._sanitize_for_console(s))
         p("=" * 60)
-        p("  FEATURE ENGINE PRO - AUDIT REPORT")
+        p("  PRUNEX - AUDIT REPORT")
         p("=" * 60)
         df_logs = self.generate_summary()
         if df_logs.empty:
@@ -532,7 +532,7 @@ class Reporter:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feature Engine Pro - Audit Report</title>
+    <title>PruneX - Audit Report</title>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -769,7 +769,7 @@ class Reporter:
 <body>
 
     <div class="header">
-        <h1>Feature Engine Pro</h1>
+        <h1>PruneX</h1>
         <p class="subtitle">Automated Feature Selection - Audit Report</p>
     </div>
 
@@ -833,7 +833,7 @@ class Reporter:
         </div>
 
         <div class="footer">
-            Feature Engine Pro v2.0 • Corporate Audit Report
+            PruneX v1.0 • Corporate Audit Report
         </div>
     </div>
 

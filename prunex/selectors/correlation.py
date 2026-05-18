@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from feature_engine_pro.selectors.base_selector import _BaseSelector
+from prunex.selectors.base_selector import _BaseSelector
 
 class CorrelationSelector(_BaseSelector):
     """

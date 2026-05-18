@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from feature_engine_pro.selectors.correlation import CorrelationSelector
+from prunex.selectors.correlation import CorrelationSelector
 
 def test_correlation_drops_lower_target_correlation():
     # Arrange

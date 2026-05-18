@@ -1,8 +1,8 @@
-# Feature Engine Pro
+# PruneX
 
-Feature Engine Pro is an advanced, deterministically-driven Python library designed for automated feature engineering and mathematically rigorous feature selection.
+PruneX is an advanced, deterministically-driven Python library designed for automated feature engineering and mathematically rigorous feature selection.
 
-In real-world machine learning environments, datasets frequently contain hundreds or thousands of columns. Navigating this high dimensionality manually is prone to error and bias. Feature Engine Pro solves this by providing a multi-stage, Scikit-Learn compatible mathematical funnel that autonomously selects only the features that positively impact model performance.
+In real-world machine learning environments, datasets frequently contain hundreds or thousands of columns. Navigating this high dimensionality manually is prone to error and bias. PruneX solves this by providing a multi-stage, Scikit-Learn compatible mathematical funnel that autonomously selects only the features that positively impact model performance.
 
 Crucially, this library resolves the "black box" problem of automated data pipelines by generating a comprehensive HTML Audit Report, detailing the exact mathematical reasoning behind every feature kept or dropped.
 
@@ -15,7 +15,7 @@ Crucially, this library resolves the "black box" problem of automated data pipel
 
 ## Pipeline Architecture
 
-Feature Engine Pro processes high-dimensional data through a sequence of modular stages:
+PruneX processes high-dimensional data through a sequence of modular stages:
 
 ### Stage 1: Automated Feature Engineering
 * **Datetime Expansion:** Detects temporal columns and extracts granular numerical representations (year, month, day, day-of-week, weekend flags).
@@ -27,7 +27,7 @@ Feature Engine Pro processes high-dimensional data through a sequence of modular
 
 ### Stage 3: The Mathematical Selection Funnel
 
-Feature Engine Pro produces a statistically rigorous, reproducible feature set not through heuristics, manual guesswork, or non-deterministic LLM agents, but by forcing every feature through **four rigorous mathematical gates**. This specific sequence is engineered to iteratively strip away noise, resolve collinearity, and isolate the pure predictive signal. This systematic funnel stabilizes model coefficients, prevents overfitting, and maximizes generalization.
+PruneX produces a statistically rigorous, reproducible feature set not through heuristics, manual guesswork, or non-deterministic LLM agents, but by forcing every feature through **four rigorous mathematical gates**. This specific sequence is engineered to iteratively strip away noise, resolve collinearity, and isolate the pure predictive signal. This systematic funnel stabilizes model coefficients, prevents overfitting, and maximizes generalization.
 
 #### 1. Variance Filter (The Signal Verification Gate)
 Before evaluating a feature against the target, the feature must first possess internal variance. A feature without variance contains no information. We define population variance as:
@@ -80,7 +80,7 @@ The entire framework can be instantiated and run with a few lines of code.
 
 ```python
 import pandas as pd
-from feature_engine_pro.engine import FeatureEngine
+from prunex.engine import FeatureEngine
 from sklearn.model_selection import train_test_split
 
 # 1. Load Data

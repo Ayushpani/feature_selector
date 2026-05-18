@@ -3,14 +3,14 @@ requires = ["setuptools>=42", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "feature-engine-pro"
+name = "prunex"
 version = "1.0.0"
 description = "A professional, enterprise-grade feature selection and engineering pipeline."
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
-    {name = "Feature Engine Pro Team"}
+    {name = "PruneX Team"}
 ]
 dependencies = [
     "pandas>=1.0.0",
@@ -28,4 +28,4 @@ dependencies = [
 test = ["pytest>=6.0.0"]
 
 [tool.setuptools]
-packages = ["feature_engine_pro", "feature_engine_pro.transformers", "feature_engine_pro.selectors"]
+packages = ["prunex", "prunex.transformers", "prunex.selectors"]

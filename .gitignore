@@ -1,8 +1,11 @@
-.venv
-test_report.html
-<<<<<<< Updated upstream
-=======
-test_report_v2.html
->>>>>>> Stashed changes
+.venv/
+venv/
+*.html
+*.pdf
+*.joblib
 __pycache__/
 *.pyc
+*.egg-info/
+build/
+dist/
+.pytest_cache/

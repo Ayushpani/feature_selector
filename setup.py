@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="feature-engine-pro",
+    name="prunex",
     version="1.0.0",
     packages=find_packages(),
     install_requires=[
@@ -16,7 +16,7 @@ setup(
         "nest-asyncio>=1.5.0",
     ],
     extras_require={"test": ["pytest>=6.0.0"]},
-    author="Feature Engine Pro Team",
+    author="PruneX Team",
     description="A professional, enterprise-grade feature selection and engineering pipeline.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",

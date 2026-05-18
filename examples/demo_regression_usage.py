@@ -1,7 +1,7 @@
 """
 Demo Regression Usage - Full Messy Real-World Regression Example
 
-Demonstrates the complete Feature Engine Pro pipeline on a messy, real-world regression dataset.
+Demonstrates the complete PruneX pipeline on a messy, real-world regression dataset.
 It features datetime extraction, group aggregation, missing values, high-cardinality categorical
 encoding (target encoding), non-linear selection, and target leakage guards.
 """
@@ -9,12 +9,12 @@ import pandas as pd
 import numpy as np
 from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
-from feature_engine_pro.engine import FeatureEngine
+from prunex.engine import FeatureEngine
 
 
 def main():
     print("=" * 60)
-    print("  Feature Engine Pro v2.0 - Messy Regression Demo")
+    print("  PruneX v1.0 - Messy Regression Demo")
     print("=" * 60)
 
     # 1. Load Regression Dataset (California Housing)
@@ -81,7 +81,7 @@ def main():
     )
 
     # 5. Fit the entire mathematical funnel on training data only
-    print("\nFitting Feature Engine Pro Pipeline...")
+    print("\nFitting PruneX Pipeline...")
     engine.fit(X_train, y_train)
 
     # 6. Transform both train and test sets

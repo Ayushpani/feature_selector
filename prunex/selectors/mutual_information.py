@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from sklearn.feature_selection import mutual_info_classif, mutual_info_regression
-from feature_engine_pro.selectors.base_selector import _BaseSelector
+from prunex.selectors.base_selector import _BaseSelector
 
 class MutualInformationSelector(_BaseSelector):
     """
