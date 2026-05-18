@@ -1,8 +1,8 @@
 import pytest
 import pandas as pd
 import numpy as np
-from feature_engine_pro.selectors.mutual_information import MutualInformationSelector
-from feature_engine_pro.reporter import Reporter
+from prunex.selectors.mutual_information import MutualInformationSelector
+from prunex.reporter import Reporter
 
 def test_mutual_information_dynamic_threshold_and_leakage():
     # Arrange

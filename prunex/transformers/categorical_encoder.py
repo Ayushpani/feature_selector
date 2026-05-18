@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from feature_engine_pro.transformers.base_transformer import _BaseTransformer
+from prunex.transformers.base_transformer import _BaseTransformer
 
 class AutoCategoricalEncoder(_BaseTransformer):
     """

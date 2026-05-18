@@ -1,14 +1,14 @@
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
-from feature_engine_pro.data_processor import DataProcessor
-from feature_engine_pro.transformers.categorical_encoder import AutoCategoricalEncoder
-from feature_engine_pro.transformers.datetime_extractor import DatetimeExtractor
-from feature_engine_pro.transformers.group_aggregator import GroupAggregator
-from feature_engine_pro.selectors.variance_threshold import VarianceThresholdSelector
-from feature_engine_pro.selectors.correlation import CorrelationSelector
-from feature_engine_pro.selectors.mutual_information import MutualInformationSelector
-from feature_engine_pro.selectors.rfe import RFESelector
-from feature_engine_pro.reporter import Reporter
+from prunex.data_processor import DataProcessor
+from prunex.transformers.categorical_encoder import AutoCategoricalEncoder
+from prunex.transformers.datetime_extractor import DatetimeExtractor
+from prunex.transformers.group_aggregator import GroupAggregator
+from prunex.selectors.variance_threshold import VarianceThresholdSelector
+from prunex.selectors.correlation import CorrelationSelector
+from prunex.selectors.mutual_information import MutualInformationSelector
+from prunex.selectors.rfe import RFESelector
+from prunex.reporter import Reporter
 
 class FeatureEngine(BaseEstimator, TransformerMixin):
     """
@@ -17,7 +17,7 @@ class FeatureEngine(BaseEstimator, TransformerMixin):
     """
     def __init__(self, target_column=None, problem_type='classification',
                  mode='balanced', variance_threshold=0.01, correlation_threshold=0.85,
-                 mi_threshold=0.01, rfe_n_features=None, enable_evaluation=True, verbosity=1):
+                 mi_threshold='dynamic', rfe_n_features=None, enable_evaluation=True, verbosity=1):
         # We store these explicitly for scikit-learn's get_params/set_params to work
         self.target_column = target_column
         self.problem_type = problem_type

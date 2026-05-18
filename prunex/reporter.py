@@ -23,7 +23,7 @@ import time
 import json
 from datetime import datetime
 
-from feature_engine_pro.logger import get_logger
+from prunex.logger import get_logger
 
 
 class Reporter:
@@ -86,10 +86,14 @@ class Reporter:
         # Detect if we're inside a running asyncio loop (Colab / Jupyter).
         _in_async_env = False
         try:
-            loop = asyncio.get_running_loop()
+            # Playwright checks both running_loop and event_loop
+            try:
+                loop = asyncio.get_running_loop()
+            except RuntimeError:
+                loop = asyncio.get_event_loop()
             if loop.is_running():
                 _in_async_env = True
-        except RuntimeError:
+        except Exception:
             pass
 
         if _in_async_env:
@@ -132,22 +136,25 @@ class Reporter:
         self._logger.info(f"[Reporter] High-quality PDF generated: {pdf_filepath}")
 
     def _launch_browser_sync(self, playwright_ctx):
-        """Try to launch Chromium; auto-install if missing."""
+        """Try to launch Chromium; auto-install and fetch OS deps if missing."""
         import subprocess, sys
         try:
             return playwright_ctx.chromium.launch(headless=True)
         except Exception as e:
-            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
-                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
-                try:
-                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-                    return playwright_ctx.chromium.launch(headless=True)
-                except Exception as ie:
-                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
-                    self._logger.error("Please run 'playwright install chromium' manually.")
-                    return None
-            else:
-                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
+            self._logger.info("[Reporter] Browser launch failed. Attempting automated cross-platform installation...")
+            try:
+                # 1. Install the Chromium browser binaries
+                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                
+                # 2. Attempt to install OS-level dependencies (Crucial for Linux/Colab/Docker)
+                # We do not use check=True here because install-deps might fail on non-root Windows/Mac systems
+                # where the dependencies are usually already present natively anyway.
+                subprocess.run([sys.executable, "-m", "playwright", "install-deps", "chromium"], check=False)
+                
+                return playwright_ctx.chromium.launch(headless=True)
+            except Exception as ie:
+                self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                self._logger.error("Please run 'playwright install chromium' and 'playwright install-deps' manually.")
                 return None
 
     # ------------------------------------------------------------------
@@ -184,34 +191,40 @@ class Reporter:
 
             self._logger.info(f"[Reporter] High-quality PDF generated: {pdf_filepath}")
 
+        # In Colab/Jupyter the loop is already running, so we can use
+        # nest_asyncio to allow nested run(), or schedule via ensure_future.
         import asyncio
         try:
             import nest_asyncio
             nest_asyncio.apply()
             asyncio.get_event_loop().run_until_complete(_run())
         except ImportError:
+            # nest_asyncio not available — try ensure_future + manual blocking
             import concurrent.futures
             future = asyncio.ensure_future(_run())
             loop = asyncio.get_event_loop()
             loop.run_until_complete(future)
 
     async def _launch_browser_async(self, playwright_ctx):
-        """Try to launch Chromium async; auto-install if missing."""
+        """Try to launch Chromium async; auto-install and fetch OS deps if missing."""
         import subprocess, sys
         try:
             return await playwright_ctx.chromium.launch(headless=True)
         except Exception as e:
-            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
-                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
-                try:
-                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-                    return await playwright_ctx.chromium.launch(headless=True)
-                except Exception as ie:
-                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
-                    self._logger.error("Please run 'playwright install chromium' manually.")
-                    return None
-            else:
-                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
+            self._logger.info("[Reporter] Browser launch failed. Attempting automated cross-platform installation...")
+            try:
+                # 1. Install the Chromium browser binaries
+                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                
+                # 2. Attempt to install OS-level dependencies (Crucial for Linux/Colab/Docker)
+                # We do not use check=True here because install-deps might fail on non-root Windows/Mac systems
+                # where the dependencies are usually already present natively anyway.
+                subprocess.run([sys.executable, "-m", "playwright", "install-deps", "chromium"], check=False)
+                
+                return await playwright_ctx.chromium.launch(headless=True)
+            except Exception as ie:
+                self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                self._logger.error("Please run 'playwright install chromium' and 'playwright install-deps' manually.")
                 return None
 
     def _sanitize_for_console(self, text):
@@ -233,7 +246,7 @@ class Reporter:
         """Print summary to console."""
         p = lambda s: print(self._sanitize_for_console(s))
         p("=" * 60)
-        p("  FEATURE ENGINE PRO - AUDIT REPORT")
+        p("  PRUNEX - AUDIT REPORT")
         p("=" * 60)
         df_logs = self.generate_summary()
         if df_logs.empty:
@@ -315,7 +328,7 @@ class Reporter:
         """Construct the full HTML string."""
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        runtime = self.pipeline_runtime or 'N/A'
+        runtime_str = f"{self.pipeline_runtime}s" if self.pipeline_runtime else 'N/A'
         reduction_pct = round((n_dropped / max(n_total, 1)) * 100, 1)
 
         # Input/output counts from journey
@@ -519,7 +532,7 @@ class Reporter:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feature Engine Pro - Audit Report</title>
+    <title>PruneX - Audit Report</title>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -756,7 +769,7 @@ class Reporter:
 <body>
 
     <div class="header">
-        <h1>Feature Engine Pro</h1>
+        <h1>PruneX</h1>
         <p class="subtitle">Automated Feature Selection - Audit Report</p>
     </div>
 
@@ -764,7 +777,7 @@ class Reporter:
         
         <div class="card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
             <h2 style="border: none; margin-bottom: 0;">Executive Summary</h2>
-            <p class="subtitle">Generated on ''' + f'{timestamp}' + ''' • Pipeline runtime: ''' + f'{runtime}' + '''s</p>
+            <p class="subtitle">Generated on ''' + f'{timestamp}' + ''' • Pipeline runtime: ''' + f'{runtime_str}' + '''</p>
             
             <div class="stat-row">
                 <div class="stat-box">
@@ -820,7 +833,7 @@ class Reporter:
         </div>
 
         <div class="footer">
-            Feature Engine Pro v2.0 • Corporate Audit Report
+            PruneX v1.0 • Corporate Audit Report
         </div>
     </div>
 

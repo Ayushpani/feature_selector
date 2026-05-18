@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 import numpy as np
-from feature_engine_pro.selectors.variance_threshold import VarianceThresholdSelector
+from prunex.selectors.variance_threshold import VarianceThresholdSelector
 
 def test_variance_threshold_drops_zero_variance():
     # Arrange

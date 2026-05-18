@@ -1,4 +1,4 @@
-name: Feature Engine Pro CI
+name: PruneX CI
 
 on:
   push:
