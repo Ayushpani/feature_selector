@@ -55,6 +55,15 @@ class RFESelector(_BaseSelector):
         non_numerical_features = X.select_dtypes(exclude=np.number).columns.tolist()
         self.selected_features_ = selected_numerical_features + non_numerical_features
 
+        # Target Leakage Detection
+        leakage_warning_col = None
+        if hasattr(rfe, 'estimator_') and hasattr(rfe.estimator_, 'feature_importances_'):
+            importances = rfe.estimator_.feature_importances_
+            if len(importances) > 0 and importances.max() > 0.90:
+                leakage_idx = np.argmax(importances)
+                if leakage_idx < len(selected_numerical_features):
+                    leakage_warning_col = selected_numerical_features[leakage_idx]
+
         # Log reasoning to reporter
         if self.reporter:
             # We use ranking_ to explain why
@@ -62,7 +71,10 @@ class RFESelector(_BaseSelector):
             for idx, col in enumerate(numerical_cols):
                 rank = rfe.ranking_[idx]
                 if rank <= tier:
-                    self.reporter.log_event(col, 'kept', f'RFE Rank: {rank} (Top Tier). Mean Decrease in Impurity (MDI) indicates mathematically significant split-optimization synergy with other variables.', 'RFE')
+                    msg = f'RFE Rank: {rank} (Top Tier). Mean Decrease in Impurity (MDI) indicates mathematically significant split-optimization synergy with other variables.'
+                    if col == leakage_warning_col:
+                        msg = f'🚨 TARGET LEAKAGE WARNING: RFE Rank: {rank}. This feature alone dominates >90% of the ensemble\'s Gini importance. It is almost certainly a direct proxy for the target variable!'
+                    self.reporter.log_event(col, 'kept', msg, 'RFE')
                 else:
                     self.reporter.log_event(col, 'dropped', f'Dropped: RFE Rank {rank}. Pruned by Random Forest Ensemble. Mean Decrease in Impurity (MDI) proves it contributes no meaningful split-optimization (Gini reduction), even when evaluated synergistically.', 'RFE')
 

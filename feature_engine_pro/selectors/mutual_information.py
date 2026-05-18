@@ -36,7 +36,11 @@ class MutualInformationSelector(_BaseSelector):
 
         mi_scores_series = pd.Series(mi_scores, index=numerical_cols)
 
-        selected_numerical_features = mi_scores_series[mi_scores_series >= self.threshold].index.tolist()
+        # Dynamic threshold: 5% of the maximum information content
+        max_mi = mi_scores_series.max()
+        dynamic_threshold = 0.05 * max_mi if max_mi > 0 else self.threshold
+
+        selected_numerical_features = mi_scores_series[mi_scores_series >= dynamic_threshold].index.tolist()
         non_numerical_features = X.select_dtypes(exclude=np.number).columns.tolist()
 
         self.selected_features_ = selected_numerical_features + non_numerical_features
@@ -44,10 +48,10 @@ class MutualInformationSelector(_BaseSelector):
         # Log reasoning to reporter
         if self.reporter:
             for col, score in mi_scores_series.items():
-                if score >= self.threshold:
-                     self.reporter.log_event(col, 'kept', f'Mutual Information Score = {score:.4f} >= {self.threshold}. Feature provides statistically significant non-linear reduction in uncertainty about the target.', 'MutualInformation')
+                if score >= dynamic_threshold:
+                     self.reporter.log_event(col, 'kept', f'Mutual Information Score = {score:.4f} >= dynamic threshold {dynamic_threshold:.4f} (5% of max MI). Feature provides statistically significant non-linear reduction in uncertainty about the target.', 'MutualInformation')
                 else:
-                     self.reporter.log_event(col, 'dropped', f'Mutual Information Score = {score:.4f} < {self.threshold}. Information Theory proves this feature provides no statistically significant reduction in uncertainty (Entropy) about the target Y. Pruned to minimize noise.', 'MutualInformation')
+                     self.reporter.log_event(col, 'dropped', f'Mutual Information Score = {score:.4f} < dynamic threshold {dynamic_threshold:.4f} (5% of max MI). Information Theory proves this feature provides no statistically significant reduction in uncertainty (Entropy) relative to the dataset. Pruned to minimize noise.', 'MutualInformation')
 
             for col in non_numerical_features:
                  self.reporter.log_event(col, 'kept', 'Not numerical, skipped by Mutual Info.', 'MutualInformation')
