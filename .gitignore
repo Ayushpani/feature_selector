@@ -1,4 +1,8 @@
 .venv
 test_report.html
+<<<<<<< Updated upstream
+=======
+test_report_v2.html
+>>>>>>> Stashed changes
 __pycache__/
 *.pyc

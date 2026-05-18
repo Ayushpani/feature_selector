@@ -86,14 +86,10 @@ class Reporter:
         # Detect if we're inside a running asyncio loop (Colab / Jupyter).
         _in_async_env = False
         try:
-            # Playwright checks both running_loop and event_loop
-            try:
-                loop = asyncio.get_running_loop()
-            except RuntimeError:
-                loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
             if loop.is_running():
                 _in_async_env = True
-        except Exception:
+        except RuntimeError:
             pass
 
         if _in_async_env:
@@ -136,25 +132,22 @@ class Reporter:
         self._logger.info(f"[Reporter] High-quality PDF generated: {pdf_filepath}")
 
     def _launch_browser_sync(self, playwright_ctx):
-        """Try to launch Chromium; auto-install and fetch OS deps if missing."""
+        """Try to launch Chromium; auto-install if missing."""
         import subprocess, sys
         try:
             return playwright_ctx.chromium.launch(headless=True)
         except Exception as e:
-            self._logger.info("[Reporter] Browser launch failed. Attempting automated cross-platform installation...")
-            try:
-                # 1. Install the Chromium browser binaries
-                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-                
-                # 2. Attempt to install OS-level dependencies (Crucial for Linux/Colab/Docker)
-                # We do not use check=True here because install-deps might fail on non-root Windows/Mac systems
-                # where the dependencies are usually already present natively anyway.
-                subprocess.run([sys.executable, "-m", "playwright", "install-deps", "chromium"], check=False)
-                
-                return playwright_ctx.chromium.launch(headless=True)
-            except Exception as ie:
-                self._logger.error(f"[Reporter] Auto-install failed: {ie}")
-                self._logger.error("Please run 'playwright install chromium' and 'playwright install-deps' manually.")
+            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
+                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
+                try:
+                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                    return playwright_ctx.chromium.launch(headless=True)
+                except Exception as ie:
+                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                    self._logger.error("Please run 'playwright install chromium' manually.")
+                    return None
+            else:
+                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
                 return None
 
     # ------------------------------------------------------------------
@@ -191,40 +184,34 @@ class Reporter:
 
             self._logger.info(f"[Reporter] High-quality PDF generated: {pdf_filepath}")
 
-        # In Colab/Jupyter the loop is already running, so we can use
-        # nest_asyncio to allow nested run(), or schedule via ensure_future.
         import asyncio
         try:
             import nest_asyncio
             nest_asyncio.apply()
             asyncio.get_event_loop().run_until_complete(_run())
         except ImportError:
-            # nest_asyncio not available — try ensure_future + manual blocking
             import concurrent.futures
             future = asyncio.ensure_future(_run())
             loop = asyncio.get_event_loop()
             loop.run_until_complete(future)
 
     async def _launch_browser_async(self, playwright_ctx):
-        """Try to launch Chromium async; auto-install and fetch OS deps if missing."""
+        """Try to launch Chromium async; auto-install if missing."""
         import subprocess, sys
         try:
             return await playwright_ctx.chromium.launch(headless=True)
         except Exception as e:
-            self._logger.info("[Reporter] Browser launch failed. Attempting automated cross-platform installation...")
-            try:
-                # 1. Install the Chromium browser binaries
-                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-                
-                # 2. Attempt to install OS-level dependencies (Crucial for Linux/Colab/Docker)
-                # We do not use check=True here because install-deps might fail on non-root Windows/Mac systems
-                # where the dependencies are usually already present natively anyway.
-                subprocess.run([sys.executable, "-m", "playwright", "install-deps", "chromium"], check=False)
-                
-                return await playwright_ctx.chromium.launch(headless=True)
-            except Exception as ie:
-                self._logger.error(f"[Reporter] Auto-install failed: {ie}")
-                self._logger.error("Please run 'playwright install chromium' and 'playwright install-deps' manually.")
+            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
+                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
+                try:
+                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                    return await playwright_ctx.chromium.launch(headless=True)
+                except Exception as ie:
+                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                    self._logger.error("Please run 'playwright install chromium' manually.")
+                    return None
+            else:
+                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
                 return None
 
     def _sanitize_for_console(self, text):

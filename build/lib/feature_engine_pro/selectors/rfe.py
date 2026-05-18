@@ -23,11 +23,11 @@ class RFESelector(_BaseSelector):
         numerical_cols = X.select_dtypes(include=np.number).columns.tolist()
 
         # We need a target variable y to train the model for RFE
-        if y is None or len(numerical_cols) <= 1:
+        if y is None or len(numerical_cols) == 0:
             self.selected_features_ = X.columns.tolist()
             if self.reporter:
                  for col in self.original_feature_names:
-                     self.reporter.log_event(col, 'kept', 'RFE skipped: No target y provided or not enough numerical cols.', 'RFE')
+                     self.reporter.log_event(col, 'kept', 'RFE skipped: No target y provided or no numerical cols.', 'RFE')
             return self
 
         # Initialize the appropriate estimator based on the problem type
@@ -55,28 +55,15 @@ class RFESelector(_BaseSelector):
         non_numerical_features = X.select_dtypes(exclude=np.number).columns.tolist()
         self.selected_features_ = selected_numerical_features + non_numerical_features
 
-        # Target Leakage Detection
-        leakage_warning_col = None
-        if hasattr(rfe, 'estimator_') and hasattr(rfe.estimator_, 'feature_importances_'):
-            importances = rfe.estimator_.feature_importances_
-            if len(importances) > 0 and importances.max() > 0.90:
-                leakage_idx = np.argmax(importances)
-                if leakage_idx < len(selected_numerical_features):
-                    leakage_warning_col = selected_numerical_features[leakage_idx]
-
         # Log reasoning to reporter
         if self.reporter:
             # We use ranking_ to explain why
-            tier = n_select
             for idx, col in enumerate(numerical_cols):
                 rank = rfe.ranking_[idx]
-                if rank <= tier:
-                    msg = f'RFE Rank: {rank} (Selected Tier). Mean Decrease in Impurity (MDI) indicates mathematically significant split-optimization synergy with other variables. Note: Scikit-Learn RFE assigns Rank 1 to all mutually surviving features, representing a bucketed importance tier rather than strict sequential ordering.'
-                    if col == leakage_warning_col:
-                        msg = f'🚨 TARGET LEAKAGE WARNING: RFE Rank: {rank}. This feature alone dominates >90% of the ensemble\'s Gini importance. It is almost certainly a direct proxy for the target variable!'
-                    self.reporter.log_event(col, 'kept', msg, 'RFE')
+                if col in selected_numerical_features:
+                    self.reporter.log_event(col, 'kept', f'RFE Ranked {rank} (Top Tier Feature Importance).', 'RFE')
                 else:
-                    self.reporter.log_event(col, 'dropped', f'Dropped: RFE Rank {rank}. Pruned by Random Forest Ensemble. Mean Decrease in Impurity (MDI) proves it contributes no meaningful split-optimization (Gini reduction), even when evaluated synergistically.', 'RFE')
+                    self.reporter.log_event(col, 'dropped', f'RFE Ranked {rank}. Eliminated due to low tree-based feature importance.', 'RFE')
 
             for col in non_numerical_features:
                  self.reporter.log_event(col, 'kept', 'Not numerical, skipped by RFE.', 'RFE')
