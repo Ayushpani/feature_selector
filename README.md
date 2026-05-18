@@ -1,5 +1,7 @@
 # PruneX
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1AX9G5woBs2pioFPOugkeYwu_W8oyZtBV?usp=sharing)
+
 PruneX is an advanced, deterministically-driven Python library designed for automated feature engineering and mathematically rigorous feature selection.
 
 In real-world machine learning environments, datasets frequently contain hundreds or thousands of columns. Navigating this high dimensionality manually is prone to error and bias. PruneX solves this by providing a multi-stage, Scikit-Learn compatible mathematical funnel that autonomously selects only the features that positively impact model performance.
@@ -164,6 +166,12 @@ Calling `.generate_report("report.html")` produces a standalone HTML document co
 * A visual Bar Chart Funnel illustrating the reduction at each pipeline stage.
 * A pre-filtering Correlation Heatmap to visualize dataset collinearity.
 * A comprehensive Tabular Audit Trail detailing the exact mathematical reason a specific column was eliminated (e.g., *"[CorrelationSelector] Dropped: Correlated 0.92 with feature_X. Kept feature_X because it has higher correlation to target."*).
+
+### Interactive Executive Dashboard
+![PruneX Executive Summary Dashboard](assets/demo_report.png)
+
+### Multicollinearity Correlation Matrix Heatmap
+![PruneX Correlation Matrix Heatmap](assets/regression_report.png)
 
 ## Contributing
 
