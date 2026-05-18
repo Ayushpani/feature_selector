@@ -136,22 +136,25 @@ class Reporter:
         self._logger.info(f"[Reporter] High-quality PDF generated: {pdf_filepath}")
 
     def _launch_browser_sync(self, playwright_ctx):
-        """Try to launch Chromium; auto-install if missing."""
+        """Try to launch Chromium; auto-install and fetch OS deps if missing."""
         import subprocess, sys
         try:
             return playwright_ctx.chromium.launch(headless=True)
         except Exception as e:
-            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
-                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
-                try:
-                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-                    return playwright_ctx.chromium.launch(headless=True)
-                except Exception as ie:
-                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
-                    self._logger.error("Please run 'playwright install chromium' manually.")
-                    return None
-            else:
-                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
+            self._logger.info("[Reporter] Browser launch failed. Attempting automated cross-platform installation...")
+            try:
+                # 1. Install the Chromium browser binaries
+                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                
+                # 2. Attempt to install OS-level dependencies (Crucial for Linux/Colab/Docker)
+                # We do not use check=True here because install-deps might fail on non-root Windows/Mac systems
+                # where the dependencies are usually already present natively anyway.
+                subprocess.run([sys.executable, "-m", "playwright", "install-deps", "chromium"], check=False)
+                
+                return playwright_ctx.chromium.launch(headless=True)
+            except Exception as ie:
+                self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                self._logger.error("Please run 'playwright install chromium' and 'playwright install-deps' manually.")
                 return None
 
     # ------------------------------------------------------------------
@@ -203,22 +206,25 @@ class Reporter:
             loop.run_until_complete(future)
 
     async def _launch_browser_async(self, playwright_ctx):
-        """Try to launch Chromium async; auto-install if missing."""
+        """Try to launch Chromium async; auto-install and fetch OS deps if missing."""
         import subprocess, sys
         try:
             return await playwright_ctx.chromium.launch(headless=True)
         except Exception as e:
-            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
-                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
-                try:
-                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-                    return await playwright_ctx.chromium.launch(headless=True)
-                except Exception as ie:
-                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
-                    self._logger.error("Please run 'playwright install chromium' manually.")
-                    return None
-            else:
-                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
+            self._logger.info("[Reporter] Browser launch failed. Attempting automated cross-platform installation...")
+            try:
+                # 1. Install the Chromium browser binaries
+                subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                
+                # 2. Attempt to install OS-level dependencies (Crucial for Linux/Colab/Docker)
+                # We do not use check=True here because install-deps might fail on non-root Windows/Mac systems
+                # where the dependencies are usually already present natively anyway.
+                subprocess.run([sys.executable, "-m", "playwright", "install-deps", "chromium"], check=False)
+                
+                return await playwright_ctx.chromium.launch(headless=True)
+            except Exception as ie:
+                self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                self._logger.error("Please run 'playwright install chromium' and 'playwright install-deps' manually.")
                 return None
 
     def _sanitize_for_console(self, text):
