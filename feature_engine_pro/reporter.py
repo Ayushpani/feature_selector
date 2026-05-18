@@ -328,7 +328,7 @@ class Reporter:
         """Construct the full HTML string."""
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        runtime = self.pipeline_runtime or 'N/A'
+        runtime_str = f"{self.pipeline_runtime}s" if self.pipeline_runtime else 'N/A'
         reduction_pct = round((n_dropped / max(n_total, 1)) * 100, 1)
 
         # Input/output counts from journey
@@ -777,7 +777,7 @@ class Reporter:
         
         <div class="card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
             <h2 style="border: none; margin-bottom: 0;">Executive Summary</h2>
-            <p class="subtitle">Generated on ''' + f'{timestamp}' + ''' • Pipeline runtime: ''' + f'{runtime}' + '''s</p>
+            <p class="subtitle">Generated on ''' + f'{timestamp}' + ''' • Pipeline runtime: ''' + f'{runtime_str}' + '''</p>
             
             <div class="stat-row">
                 <div class="stat-box">

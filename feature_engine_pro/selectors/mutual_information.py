@@ -9,7 +9,7 @@ class MutualInformationSelector(_BaseSelector):
     Captures non-linear dependencies between features and the target.
     Features with Mutual Information below a threshold are dropped.
     """
-    def __init__(self, threshold=0.01, target_column=None, problem_type='classification'):
+    def __init__(self, threshold='dynamic', target_column=None, problem_type='classification'):
         super().__init__(target_column, problem_type)
         self.threshold = threshold
         self.reporter = None
@@ -36,11 +36,16 @@ class MutualInformationSelector(_BaseSelector):
 
         mi_scores_series = pd.Series(mi_scores, index=numerical_cols)
 
-        # Dynamic threshold: 5% of the maximum information content
+        # Dynamic or absolute thresholding
         max_mi = mi_scores_series.max()
-        dynamic_threshold = 0.05 * max_mi if max_mi > 0 else self.threshold
+        if self.threshold == 'dynamic':
+            applied_threshold = 0.05 * max_mi if max_mi > 0 else 0.01
+            threshold_desc = f"dynamic threshold {applied_threshold:.4f} (5% of max MI)"
+        else:
+            applied_threshold = float(self.threshold)
+            threshold_desc = f"absolute threshold {applied_threshold:.4f}"
 
-        selected_numerical_features = mi_scores_series[mi_scores_series >= dynamic_threshold].index.tolist()
+        selected_numerical_features = mi_scores_series[mi_scores_series >= applied_threshold].index.tolist()
         non_numerical_features = X.select_dtypes(exclude=np.number).columns.tolist()
 
         self.selected_features_ = selected_numerical_features + non_numerical_features
@@ -48,13 +53,13 @@ class MutualInformationSelector(_BaseSelector):
         # Log reasoning to reporter
         if self.reporter:
             for col, score in mi_scores_series.items():
-                if score >= dynamic_threshold:
-                     msg = f'Mutual Information Score = {score:.4f} >= dynamic threshold {dynamic_threshold:.4f} (5% of max MI). Feature provides statistically significant non-linear reduction in uncertainty about the target.'
+                if score >= applied_threshold:
+                     msg = f'Mutual Information Score = {score:.4f} >= {threshold_desc}. Feature provides statistically significant non-linear reduction in uncertainty about the target.'
                      if score > 0.90:
                          msg = f'🚨 TARGET LEAKAGE WARNING 🚨: Mutual Information Score = {score:.4f}. This feature perfectly predicts the target with almost zero entropy loss. It is almost certainly derived directly from the target variable!'
                      self.reporter.log_event(col, 'kept', msg, 'MutualInformation')
                 else:
-                     self.reporter.log_event(col, 'dropped', f'Mutual Information Score = {score:.4f} < dynamic threshold {dynamic_threshold:.4f} (5% of max MI). Information Theory proves this feature provides no statistically significant reduction in uncertainty (Entropy) relative to the dataset. Pruned to minimize noise.', 'MutualInformation')
+                     self.reporter.log_event(col, 'dropped', f'Mutual Information Score = {score:.4f} < {threshold_desc}. Information Theory proves this feature provides no statistically significant reduction in uncertainty (Entropy) relative to the dataset. Pruned to minimize noise.', 'MutualInformation')
 
             for col in non_numerical_features:
                  self.reporter.log_event(col, 'kept', 'Not numerical, skipped by Mutual Info.', 'MutualInformation')

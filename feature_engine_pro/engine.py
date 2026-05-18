@@ -17,7 +17,7 @@ class FeatureEngine(BaseEstimator, TransformerMixin):
     """
     def __init__(self, target_column=None, problem_type='classification',
                  mode='balanced', variance_threshold=0.01, correlation_threshold=0.85,
-                 mi_threshold=0.01, rfe_n_features=None, enable_evaluation=True, verbosity=1):
+                 mi_threshold='dynamic', rfe_n_features=None, enable_evaluation=True, verbosity=1):
         # We store these explicitly for scikit-learn's get_params/set_params to work
         self.target_column = target_column
         self.problem_type = problem_type

@@ -42,7 +42,11 @@ class RFESelector(_BaseSelector):
              n_select = max(1, len(numerical_cols) // 2)
 
         # Guard against n_features_to_select > n_features
+        original_n_select = n_select
         n_select = min(n_select, len(numerical_cols))
+        if original_n_select > len(numerical_cols):
+             import warnings
+             warnings.warn(f"rfe_n_features ({original_n_select}) is greater than the number of remaining numerical features ({len(numerical_cols)}). Automatically adjusting to {n_select}.", UserWarning)
 
         rfe = RFE(estimator=estimator, n_features_to_select=n_select, step=self.step)
 
@@ -64,16 +68,23 @@ class RFESelector(_BaseSelector):
                 if leakage_idx < len(selected_numerical_features):
                     leakage_warning_col = selected_numerical_features[leakage_idx]
 
+        # Map selected features to their importances
+        importance_map = {}
+        if hasattr(rfe, 'estimator_') and hasattr(rfe.estimator_, 'feature_importances_'):
+            importances = rfe.estimator_.feature_importances_
+            for idx, col in enumerate(selected_numerical_features):
+                if idx < len(importances):
+                    importance_map[col] = importances[idx]
+
         # Log reasoning to reporter
         if self.reporter:
-            # We use ranking_ to explain why
-            tier = n_select
             for idx, col in enumerate(numerical_cols):
                 rank = rfe.ranking_[idx]
-                if rank <= tier:
-                    msg = f'RFE Rank: {rank} (Selected Tier). Mean Decrease in Impurity (MDI) indicates mathematically significant split-optimization synergy with other variables. Note: Scikit-Learn RFE assigns Rank 1 to all mutually surviving features, representing a bucketed importance tier rather than strict sequential ordering.'
+                if rank == 1:
+                    importance = importance_map.get(col, 0.0)
+                    msg = f'RFE Rank: 1 (Selected Tier - Gini Importance: {importance:.2%}). Tree ensemble MDI indicates mathematically superior split-optimization synergy with other variables.'
                     if col == leakage_warning_col:
-                        msg = f'🚨 TARGET LEAKAGE WARNING: RFE Rank: {rank}. This feature alone dominates >90% of the ensemble\'s Gini importance. It is almost certainly a direct proxy for the target variable!'
+                        msg = f'🚨 TARGET LEAKAGE WARNING: RFE Rank: 1 (Selected Tier - Gini Importance: {importance:.2%}). This feature alone dominates >90% of the ensemble\'s Gini importance. It is almost certainly a direct proxy for the target variable!'
                     self.reporter.log_event(col, 'kept', msg, 'RFE')
                 else:
                     self.reporter.log_event(col, 'dropped', f'Dropped: RFE Rank {rank}. Pruned by Random Forest Ensemble. Mean Decrease in Impurity (MDI) proves it contributes no meaningful split-optimization (Gini reduction), even when evaluated synergistically.', 'RFE')
