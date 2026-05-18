@@ -36,10 +36,30 @@ Feature Engine Pro processes high-dimensional data through a sequence of modular
 * **Target Encoding:** Converts high-cardinality categorical string columns into continuous numerical data by mapping them against the target variable.
 
 ### Stage 3: The Mathematical Selection Funnel
-* **Variance Filter:** Eliminates zero-variance constants and low-variance features that carry no signal.
-* **Collinearity Filter:** Identifies heavily correlated feature pairs. It evaluates both features against the target variable and intelligently drops the redundant feature providing the least predictive power.
-* **Mutual Information:** Applies Information Theory to identify and preserve features with complex, non-linear dependencies on the target.
-* **Recursive Feature Elimination (RFE):** Uses tree-based ensemble estimators (Random Forest) and feature importance ranking to iteratively prune the weakest remaining columns.
+
+Feature Engine Pro guarantees the "perfect outcome" by forcing every feature to mathematically justify its presence through four rigorous statistical gates. This guarantees the final dataset has maximized predictive signal and zero multicollinearity.
+
+#### 1. Variance Filter (Signal Verification)
+Before evaluating a feature against the target, it must first possess internal variance. Mathematically, the population variance is defined as:
+$$ \sigma^2 = \frac{1}{N} \sum_{i=1}^{N} (x_i - \mu)^2 $$
+Features where $\sigma^2$ approaches $0$ are virtually constants. They carry no discriminative signal (Information Entropy $H(X) \approx 0$) and mathematically cannot improve split criteria in decision trees or gradient descent in linear models. The Engine strips these immediately.
+
+#### 2. Collinearity Filter (Pearson Correlation)
+Linear models suffer from inflated standard errors when predictor variables are highly correlated (Multicollinearity). The Collinearity Filter evaluates every pair of features using the Pearson Correlation Coefficient:
+$$ r_{xy} = \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n} (x_i - \bar{x})^2 \sum_{i=1}^{n} (y_i - \bar{y})^2}} $$
+When $ |r_{xy}| > \text{threshold} $ (e.g., $0.85$), the Engine flags the collinear pair. It then computes the correlation of both features against the *target variable* $y$. The feature with the lower target correlation is dropped, resolving the collinearity while preserving the strongest predictive signal.
+
+#### 3. Mutual Information (Information Theory)
+While Pearson correlation captures linear relationships, **Mutual Information (MI)** captures non-linear dependencies. Rooted in Information Theory, it measures the reduction in uncertainty about the target $Y$ given the feature $X$. It is defined using Shannon Entropy $H$:
+$$ I(X; Y) = H(X) - H(X|Y) = \sum_{y \in Y} \sum_{x \in X} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right) $$
+If a feature's MI score is below the strict threshold (e.g., $0.01$), it implies $X$ provides statistically insignificant information about $Y$, and it is eliminated.
+
+#### 4. Recursive Feature Elimination (RFE) via Ensembles
+The final stage is an aggressive, iterative pruning process. The Engine trains an internal ensemble model (e.g., Random Forest), which minimizes Gini Impurity (for classification) or Mean Squared Error (for regression) at every split.
+
+The importance of a feature $X_m$ is determined by its **Mean Decrease in Impurity (MDI)** across all trees $t$ in the forest:
+$$ \text{Importance}(X_m) = \frac{1}{N_T} \sum_{t} \sum_{v \in S_{X_m}} \frac{N_v}{N} \Delta i(v, t) $$
+Where $\Delta i(v, t)$ is the impurity decrease at node $v$ split by $X_m$. The lowest-ranked features are recursively eliminated, and the model is continuously retrained until only the specified top-tier features remain.
 
 ## Installation
 
