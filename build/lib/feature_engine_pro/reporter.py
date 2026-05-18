@@ -66,46 +66,61 @@ class Reporter:
         return pd.DataFrame(self.logs)
 
     def generate_pdf_report(self, html_filepath="feature_engine_report.html", pdf_filepath="feature_engine_report.pdf"):
-        """Generate a high-quality PDF report using Playwright, auto-installing browsers if needed."""
+        """Generate a high-quality PDF report using Playwright, auto-installing browsers if needed.
+        
+        Automatically detects Colab/Jupyter (running asyncio loop) and uses the
+        Playwright Async API in that environment. Falls back to the Sync API for
+        normal Python scripts.
+        """
         import os
-        import time
         import subprocess
         import sys
-        
-        try:
-            from playwright.sync_api import sync_playwright
-        except ImportError:
-            self._logger.error("[Reporter] Playwright is not installed. This should not happen if the package was installed correctly.")
-            return
+        import asyncio
 
         self.generate_html_report(html_filepath)
         abs_path = os.path.abspath(html_filepath)
-        file_url = f"file:///{abs_path.replace('\\', '/')}"
+        file_url = f"file:///{abs_path.replace(os.sep, '/')}"
 
-        self._logger.info(f"[Reporter] Preparing PDF generation...")
-        
+        self._logger.info("[Reporter] Preparing PDF generation...")
+
+        # Detect if we're inside a running asyncio loop (Colab / Jupyter).
+        _in_async_env = False
+        try:
+            loop = asyncio.get_running_loop()
+            if loop.is_running():
+                _in_async_env = True
+        except RuntimeError:
+            pass
+
+        if _in_async_env:
+            self._generate_pdf_async(file_url, pdf_filepath)
+        else:
+            self._generate_pdf_sync(file_url, pdf_filepath)
+
+    # ------------------------------------------------------------------
+    # Sync path — used in normal Python scripts
+    # ------------------------------------------------------------------
+    def _generate_pdf_sync(self, file_url, pdf_filepath):
+        """Generate PDF using Playwright Sync API (for normal scripts)."""
+        import time
+        import subprocess
+        import sys
+
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError:
+            self._logger.error("[Reporter] Playwright is not installed. Run: pip install playwright && playwright install chromium")
+            return
+
         with sync_playwright() as p:
-            try:
-                browser = p.chromium.launch(headless=True)
-            except Exception as e:
-                if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
-                    self._logger.info("[Reporter] Chromium browser not found. Automatically installing (one-time setup)...")
-                    try:
-                        subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
-                        browser = p.chromium.launch(headless=True)
-                    except Exception as install_err:
-                        self._logger.error(f"[Reporter] Automatic browser installation failed: {install_err}")
-                        self._logger.error("Please run 'playwright install chromium' manually.")
-                        return
-                else:
-                    self._logger.error(f"[Reporter] Failed to launch browser: {e}")
-                    return
+            browser = self._launch_browser_sync(p)
+            if browser is None:
+                return
 
             page = browser.new_page()
-            self._logger.info(f"[Reporter] Generating PDF (this may take a few seconds)...")
-            # Wait for Plotly to render
+            self._logger.info("[Reporter] Generating PDF (this may take a few seconds)...")
             page.goto(file_url, wait_until='networkidle')
-            time.sleep(2)  # Give JS an extra moment for rendering
+            time.sleep(2)
             page.pdf(
                 path=pdf_filepath,
                 format="A4",
@@ -113,8 +128,91 @@ class Reporter:
                 margin={'top': '20mm', 'bottom': '20mm', 'left': '10mm', 'right': '10mm'}
             )
             browser.close()
-            
+
         self._logger.info(f"[Reporter] High-quality PDF generated: {pdf_filepath}")
+
+    def _launch_browser_sync(self, playwright_ctx):
+        """Try to launch Chromium; auto-install if missing."""
+        import subprocess, sys
+        try:
+            return playwright_ctx.chromium.launch(headless=True)
+        except Exception as e:
+            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
+                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
+                try:
+                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                    return playwright_ctx.chromium.launch(headless=True)
+                except Exception as ie:
+                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                    self._logger.error("Please run 'playwright install chromium' manually.")
+                    return None
+            else:
+                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
+                return None
+
+    # ------------------------------------------------------------------
+    # Async path — used inside Colab / Jupyter (running event loop)
+    # ------------------------------------------------------------------
+    def _generate_pdf_async(self, file_url, pdf_filepath):
+        """Generate PDF using Playwright Async API (for Colab/Jupyter)."""
+        import asyncio
+
+        async def _run():
+            import subprocess, sys
+            try:
+                from playwright.async_api import async_playwright
+            except ImportError:
+                self._logger.error("[Reporter] Playwright is not installed. Run: pip install playwright && playwright install chromium")
+                return
+
+            async with async_playwright() as p:
+                browser = await self._launch_browser_async(p)
+                if browser is None:
+                    return
+
+                page = await browser.new_page()
+                self._logger.info("[Reporter] Generating PDF (this may take a few seconds)...")
+                await page.goto(file_url, wait_until='networkidle')
+                await page.wait_for_timeout(2000)
+                await page.pdf(
+                    path=pdf_filepath,
+                    format="A4",
+                    print_background=True,
+                    margin={'top': '20mm', 'bottom': '20mm', 'left': '10mm', 'right': '10mm'}
+                )
+                await browser.close()
+
+            self._logger.info(f"[Reporter] High-quality PDF generated: {pdf_filepath}")
+
+        import asyncio
+        try:
+            import nest_asyncio
+            nest_asyncio.apply()
+            asyncio.get_event_loop().run_until_complete(_run())
+        except ImportError:
+            import concurrent.futures
+            future = asyncio.ensure_future(_run())
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(future)
+
+    async def _launch_browser_async(self, playwright_ctx):
+        """Try to launch Chromium async; auto-install if missing."""
+        import subprocess, sys
+        try:
+            return await playwright_ctx.chromium.launch(headless=True)
+        except Exception as e:
+            if "Executable doesn't exist" in str(e) or "playwright install" in str(e).lower():
+                self._logger.info("[Reporter] Chromium not found. Installing (one-time)...")
+                try:
+                    subprocess.run([sys.executable, "-m", "playwright", "install", "chromium"], check=True)
+                    return await playwright_ctx.chromium.launch(headless=True)
+                except Exception as ie:
+                    self._logger.error(f"[Reporter] Auto-install failed: {ie}")
+                    self._logger.error("Please run 'playwright install chromium' manually.")
+                    return None
+            else:
+                self._logger.error(f"[Reporter] Failed to launch browser: {e}")
+                return None
 
     def _sanitize_for_console(self, text):
         """Replace Unicode chars that crash on Windows cp1252 terminals."""

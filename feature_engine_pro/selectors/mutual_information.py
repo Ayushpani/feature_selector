@@ -49,7 +49,10 @@ class MutualInformationSelector(_BaseSelector):
         if self.reporter:
             for col, score in mi_scores_series.items():
                 if score >= dynamic_threshold:
-                     self.reporter.log_event(col, 'kept', f'Mutual Information Score = {score:.4f} >= dynamic threshold {dynamic_threshold:.4f} (5% of max MI). Feature provides statistically significant non-linear reduction in uncertainty about the target.', 'MutualInformation')
+                     msg = f'Mutual Information Score = {score:.4f} >= dynamic threshold {dynamic_threshold:.4f} (5% of max MI). Feature provides statistically significant non-linear reduction in uncertainty about the target.'
+                     if score > 0.90:
+                         msg = f'🚨 TARGET LEAKAGE WARNING 🚨: Mutual Information Score = {score:.4f}. This feature perfectly predicts the target with almost zero entropy loss. It is almost certainly derived directly from the target variable!'
+                     self.reporter.log_event(col, 'kept', msg, 'MutualInformation')
                 else:
                      self.reporter.log_event(col, 'dropped', f'Mutual Information Score = {score:.4f} < dynamic threshold {dynamic_threshold:.4f} (5% of max MI). Information Theory proves this feature provides no statistically significant reduction in uncertainty (Entropy) relative to the dataset. Pruned to minimize noise.', 'MutualInformation')
 

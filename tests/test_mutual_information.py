@@ -21,7 +21,7 @@ def test_mutual_information_dynamic_threshold_and_leakage():
     X.loc[0:50, 'weak_signal'] = y.values[0:51]
 
     # Act
-    selector = MutualInformationSelector(threshold=0.01, problem_type='regression')
+    selector = MutualInformationSelector(threshold=0.10, problem_type='regression')
     selector.reporter = Reporter()
     selector.fit(X, y)
     

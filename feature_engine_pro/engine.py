@@ -34,6 +34,9 @@ class FeatureEngine(BaseEstimator, TransformerMixin):
         """
         Fits the entire pipeline on the training data.
         """
+        import time
+        start_time = time.time()
+
         if not isinstance(X, pd.DataFrame):
             X = pd.DataFrame(X)
 
@@ -107,6 +110,9 @@ class FeatureEngine(BaseEstimator, TransformerMixin):
 
         self.selected_features_ = self.rfe_selector.selected_features_
         print(f"Pipeline Fit Complete. Selected {len(self.selected_features_)} features out of {X.shape[1]}.")
+
+        end_time = time.time()
+        self.reporter_.pipeline_runtime = round(end_time - start_time, 2)
 
         return self
 
