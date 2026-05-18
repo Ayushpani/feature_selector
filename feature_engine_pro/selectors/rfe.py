@@ -23,11 +23,11 @@ class RFESelector(_BaseSelector):
         numerical_cols = X.select_dtypes(include=np.number).columns.tolist()
 
         # We need a target variable y to train the model for RFE
-        if y is None or len(numerical_cols) == 0:
+        if y is None or len(numerical_cols) <= 1:
             self.selected_features_ = X.columns.tolist()
             if self.reporter:
                  for col in self.original_feature_names:
-                     self.reporter.log_event(col, 'kept', 'RFE skipped: No target y provided or no numerical cols.', 'RFE')
+                     self.reporter.log_event(col, 'kept', 'RFE skipped: No target y provided or not enough numerical cols.', 'RFE')
             return self
 
         # Initialize the appropriate estimator based on the problem type
@@ -71,7 +71,7 @@ class RFESelector(_BaseSelector):
             for idx, col in enumerate(numerical_cols):
                 rank = rfe.ranking_[idx]
                 if rank <= tier:
-                    msg = f'RFE Rank: {rank} (Top Tier). Mean Decrease in Impurity (MDI) indicates mathematically significant split-optimization synergy with other variables.'
+                    msg = f'RFE Rank: {rank} (Selected Tier). Mean Decrease in Impurity (MDI) indicates mathematically significant split-optimization synergy with other variables. Note: Scikit-Learn RFE assigns Rank 1 to all mutually surviving features, representing a bucketed importance tier rather than strict sequential ordering.'
                     if col == leakage_warning_col:
                         msg = f'🚨 TARGET LEAKAGE WARNING: RFE Rank: {rank}. This feature alone dominates >90% of the ensemble\'s Gini importance. It is almost certainly a direct proxy for the target variable!'
                     self.reporter.log_event(col, 'kept', msg, 'RFE')

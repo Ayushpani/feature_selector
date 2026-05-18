@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="feature-engine-pro",
-    version="0.1.7",
+    version="1.0.0",
     packages=find_packages(),
     install_requires=[
         "pandas>=1.0.0",
@@ -15,7 +15,7 @@ setup(
         "playwright>=1.15.0",
         "nest-asyncio>=1.5.0",
     ],
-    extras_require={},
+    extras_require={"test": ["pytest>=6.0.0"]},
     author="Feature Engine Pro Team",
     description="A professional, enterprise-grade feature selection and engineering pipeline.",
     long_description=open("README.md").read(),

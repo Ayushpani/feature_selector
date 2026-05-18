@@ -58,7 +58,7 @@ While Pearson correlation perfectly captures linear relationships, it fails to d
 
 $$ I(X; Y) = \sum_{y \in Y} \sum_{x \in X} p(x,y) \log \left( \frac{p(x,y)}{p(x)p(y)} \right) $$
 
-**Why this guarantees a better outcome:** If a feature's MI score falls below a strict threshold (e.g., $0.01$), it implies $X$ provides statistically insignificant information about $Y$. By dropping these, we guarantee that every feature passing this gate contains genuine, measurable predictive power, whether linear, quadratic, or highly complex.
+**Why this guarantees a better outcome:** The engine uses **Dynamic Thresholding** (e.g., pruning features that hold `< 5%` of the dataset's maximum information). This guarantees that every feature passing this gate contains genuine, measurable predictive power relative to the specific dataset's information density. **It also acts as our first Target Leakage Guard**, immediately flagging any feature whose MI score approaches perfect entropy loss ($> 0.90$).
 
 #### 4. Recursive Feature Elimination (The Synergy Gate)
 The final stage is an aggressive, iterative pruning process. The previous three gates evaluated features in isolation or pairs. RFE evaluates them *together* to account for multi-feature synergy. The Engine trains an internal ensemble model (e.g., Random Forest), which minimizes Gini Impurity at every split.
@@ -67,11 +67,11 @@ The importance of a feature $X_m$ is determined by its **Mean Decrease in Impuri
 
 $$ \text{Importance}(X_m) = \frac{1}{N_T} \sum_{t} \sum_{v \in S_{X_m}} \frac{N_v}{N} \Delta i(v, t) $$
 
-**Why this guarantees a better outcome:** Where $\Delta i(v, t)$ is the impurity decrease at node $v$ split by $X_m$. The lowest-ranked features are recursively eliminated, and the model is continuously retrained. This prevents "masking" effects where a feature looks weak initially but is highly predictive when combined with another. By the time the algorithm stops, the remaining dataset is mathematically proven to be the most concentrated, non-redundant, and highly predictive feature set possible.
+**Why this guarantees a better outcome:** By recursively eliminating the lowest-ranked features, the model prevents "masking" effects where a feature looks weak initially but is highly predictive when combined with another. The Engine also monitors the Gini distribution—if a single feature begins consuming $>90\%$ of the model's split decisions, the Engine fires a **🚨 TARGET LEAKAGE WARNING 🚨** directly into the audit report.
 
 ## Installation
 
-*(Note: Package is currently in pre-release development phase)*
+*(Version 1.0.0)*
 
 ```bash
 pip install feature-engine-pro
